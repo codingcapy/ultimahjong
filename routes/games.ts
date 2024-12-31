@@ -18,10 +18,8 @@ const createGameSchema = gameSchema.omit({
   active: true,
 });
 
-export const gamesRoute = new Hono().post(
-  "/",
-  zValidator("json", createGameSchema),
-  async (c) => {
+export const gamesRoute = new Hono()
+  .post("/", zValidator("json", createGameSchema), async (c) => {
     console.log("function running");
     try {
       const data = await c.req.valid("json");
@@ -44,5 +42,8 @@ export const gamesRoute = new Hono().post(
         message: "Internal Server Error: could not create game",
       });
     }
-  }
-);
+  })
+  .get("/", async (c) => {
+    const incomingGames = await db.select().from(games);
+    return c.json(incomingGames);
+  });

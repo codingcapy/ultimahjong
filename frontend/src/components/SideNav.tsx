@@ -13,12 +13,13 @@ export default function SideNav() {
     navigate({ to: "/" });
   }
 
-  async function handleCreateGame() {
+  async function handleCreateGame(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
     try {
       const year = "New Game";
       const new_project = { year };
       const res = await axios.post(`${DOMAIN}/api/games`, new_project);
-      if (res.data?.success && res.data.content.project_id) {
+      if (res.data?.success) {
       } else {
         throw new Error("Project ID not found in response");
       }
@@ -29,12 +30,14 @@ export default function SideNav() {
 
   return (
     <div className="hidden w-[12%] h-screen bg-black text-white md:flex flex-col justify-between">
-      <div className="pt-10 text-center font-bold">
+      <div className="pt-10 text-center">
         <Link to="/" className="pt-10 text-center font-bold">
           Ultimate MahJong
         </Link>
-        <form action="">
-          <button>New Game</button>
+        <form onSubmit={handleCreateGame}>
+          <button className="m-10 py-2 px-5 bg-green-500 rounded">
+            New Game
+          </button>
         </form>
       </div>
       <div className="flex p-10 pb-20 cursor-pointer" onClick={handleLogout}>

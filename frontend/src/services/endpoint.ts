@@ -1,3 +1,3 @@
-const DOMAIN = "https://ultimahjong-production.up.railway.app";
+const DOMAIN = "http://localhost:3333";
 
 export default DOMAIN;

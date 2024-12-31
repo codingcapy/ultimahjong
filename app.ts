@@ -4,6 +4,7 @@ import { serveStatic } from "hono/bun";
 import { cors } from "hono/cors";
 import { usersRoute } from "./routes/users";
 import { userRoute } from "./routes/user";
+import { gamesRoute } from "./routes/games";
 
 const app = new Hono();
 
@@ -22,6 +23,7 @@ app.get("/", (c) => {
 const apiRoutes = app
   .basePath("/api")
   .route("/users", usersRoute)
-  .route("/user", userRoute);
+  .route("/user", userRoute)
+  .route("/games", gamesRoute);
 
 export default app;
