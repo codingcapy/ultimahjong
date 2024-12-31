@@ -1,4 +1,4 @@
-import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
+import { createLazyFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import useAuthStore from "../store/AuthStore";
 import SideNav from "../components/SideNav";
 import { useEffect, useState } from "react";
@@ -35,18 +35,20 @@ function RouteComponent() {
             {
               //@ts-ignore
               games.map((game) => (
-                <div
-                  className="py-10 bg-gray-600 text-center text-white my-2 md:my-0"
-                  key={
-                    //@ts-ignore
-                    game.game_id
-                  }
-                >
-                  {
-                    //@ts-ignore
-                    game.year
-                  }
-                </div>
+                <Link to="/record">
+                  <div
+                    className="py-10 bg-gray-600 text-center text-white my-2 md:my-0"
+                    key={
+                      //@ts-ignore
+                      game.game_id
+                    }
+                  >
+                    {
+                      //@ts-ignore
+                      game.year
+                    }
+                  </div>
+                </Link>
               ))
             }
           </div>

@@ -1,16 +1,38 @@
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { createLazyFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import useAuthStore from "../store/AuthStore";
+import { IoMdExit } from "react-icons/io";
+import axios from "axios";
+import DOMAIN from "../services/endpoint";
+import useGamesStore from "../store/DashboardStore";
 
 export const Route = createLazyFileRoute("/record")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
+  const navigate = useNavigate();
+  const { logoutService, authLoading, user } = useAuthStore((state) => state);
+
+  function handleLogout() {
+    logoutService();
+    navigate({ to: "/" });
+  }
+
   return (
     <main className="flex-1 text-white">
       <div className="flex">
-        <div className="hidden md:block fixed top-0 left-0 w-[12%] h-screen bg-black">
-          <div className="text-white pt-10 text-center font-bold">
-            Ultimate MahJong
+        <div className="hidden md:fixed w-[12%] h-screen bg-black text-white md:flex flex-col justify-between">
+          <div className="pt-10 text-center">
+            <Link to="/" className="pt-10 text-center font-bold">
+              Ultimate MahJong
+            </Link>
+          </div>
+          <div
+            className="flex p-10 pb-20 cursor-pointer"
+            onClick={handleLogout}
+          >
+            <IoMdExit className=" py-1 w-[25px] h-[25px]" />
+            <div className="pl-2 py-0">Logout</div>
           </div>
         </div>
         <div className="w-[100%] bg-gray-700 min-h-screen p-10 md:pl-72">
