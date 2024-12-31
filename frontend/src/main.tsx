@@ -4,6 +4,7 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
+import Auth from "./components/auth/Auth";
 
 // Create a new router instance
 const router = createRouter({ routeTree });
@@ -20,8 +21,8 @@ const rootElement = document.getElementById("root")!;
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
-    <StrictMode>
+    <Auth>
       <RouterProvider router={router} />
-    </StrictMode>
+    </Auth>
   );
 }
