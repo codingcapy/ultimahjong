@@ -93,10 +93,7 @@ function RouteComponent() {
           </form>
           <div className="text-center text-gray-500">
             Don't have an account?
-            <Link
-              to="/register"
-              className="[&.active]:font-bold pl-2 text-black"
-            >
+            <Link to="/register" className="font-bold pl-2 text-black">
               Register
             </Link>
           </div>

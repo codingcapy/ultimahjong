@@ -104,7 +104,7 @@ function RouteComponent() {
           </form>
           <div className=" mt-20 text-center text-gray-500">
             Already have an account?
-            <Link to="/" className="[&.active]:font-bold pl-2 text-black">
+            <Link to="/" className="font-bold pl-2 text-black">
               Login
             </Link>
           </div>
