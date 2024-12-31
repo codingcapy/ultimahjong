@@ -16,9 +16,11 @@
   "dependencies": {
     "@hono/zod-validator": "^0.4.2",
     "@types/bcrypt": "^5.0.2",
+    "@types/bcrypt-nodejs": "^0.0.31",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/pg": "^8.11.10",
     "bcrypt": "^5.1.1",
+    "bcrypt-nodejs": "^0.0.3",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.38.3",
     "hono": "^4.6.15",
