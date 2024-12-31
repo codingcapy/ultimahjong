@@ -3,6 +3,7 @@
   "module": "index.ts",
   "scripts": {
     "start": "bun --watch index.ts",
+    "prebuild": "sudo apt-get update && sudo apt-get install -y libstdc++6",
     "install-server": "bun i",
     "start-server": "bun start"
   },
