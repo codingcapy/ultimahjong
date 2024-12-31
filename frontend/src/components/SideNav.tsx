@@ -3,10 +3,12 @@ import useAuthStore from "../store/AuthStore";
 import { IoMdExit } from "react-icons/io";
 import axios from "axios";
 import DOMAIN from "../services/endpoint";
+import useGamesStore from "../store/DashboardStore";
 
 export default function SideNav() {
   const navigate = useNavigate();
   const { logoutService, authLoading, user } = useAuthStore((state) => state);
+  const { games, setGames } = useGamesStore((state) => state);
 
   function handleLogout() {
     logoutService();
@@ -20,6 +22,13 @@ export default function SideNav() {
       const new_project = { year };
       const res = await axios.post(`${DOMAIN}/api/games`, new_project);
       if (res.data?.success) {
+        const res2 = await axios.get(`${DOMAIN}/api/games`);
+        //@ts-ignore
+        const newGames = [];
+        //@ts-ignore
+        res2.data.forEach((game) => newGames.push(game));
+        //@ts-ignore
+        setGames([...newGames]);
       } else {
         throw new Error("Project ID not found in response");
       }
