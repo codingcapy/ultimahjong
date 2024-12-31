@@ -11,7 +11,9 @@ export const Route = createLazyFileRoute("/dashboard")({
 });
 
 function RouteComponent() {
-  const { games, setGames } = useGamesStore((state) => state);
+  const { games, setGames, currentGameId, setCurrentGameId } = useGamesStore(
+    (state) => state
+  );
 
   useEffect(() => {
     async function getGames() {
@@ -35,7 +37,18 @@ function RouteComponent() {
             {
               //@ts-ignore
               games.map((game) => (
-                <Link to="/record">
+                <Link
+                  to="/record"
+                  onClick={() => {
+                    setCurrentGameId(game.game_id);
+                    console.log(game.game_id);
+                    console.log(currentGameId);
+                  }}
+                  key={
+                    //@ts-ignore
+                    game.game_id
+                  }
+                >
                   <div
                     className="py-10 bg-gray-600 text-center text-white my-2 md:my-0"
                     key={

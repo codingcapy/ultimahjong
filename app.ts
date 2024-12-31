@@ -5,6 +5,7 @@ import { cors } from "hono/cors";
 import { usersRoute } from "./routes/users";
 import { userRoute } from "./routes/user";
 import { gamesRoute } from "./routes/games";
+import { recordsRoute } from "./routes/records";
 
 const app = new Hono();
 
@@ -24,6 +25,7 @@ const apiRoutes = app
   .basePath("/api")
   .route("/users", usersRoute)
   .route("/user", userRoute)
-  .route("/games", gamesRoute);
+  .route("/games", gamesRoute)
+  .route("/records", recordsRoute);
 
 export default app;
