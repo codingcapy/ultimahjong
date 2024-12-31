@@ -3,7 +3,6 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { db, games, users } from "../connect";
 import { eq } from "drizzle-orm";
-import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
 
 const gameSchema = z.object({

@@ -3,7 +3,6 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { db, users } from "../connect";
 import { eq } from "drizzle-orm";
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 const userSchema = z.object({
@@ -29,10 +28,7 @@ export const userRoute = new Hono()
         .where(eq(users.email, loginInfo.email));
       const user = queryResult[0];
       if (!user) return c.json({ result: { user: null, token: null } });
-      const isPasswordValid = await bcrypt.compare(
-        loginInfo.password,
-        user.password || ""
-      );
+      const isPasswordValid = loginInfo.password === user.password || "";
       if (!isPasswordValid) {
         return c.json({ result: { user: null, token: null } });
       }

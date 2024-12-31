@@ -3,7 +3,6 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { db, users } from "../connect";
 import { eq } from "drizzle-orm";
-import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
 
 const saltRounds = 10;
@@ -60,7 +59,7 @@ export const usersRoute = new Hono().post(
           message: "An account associated with this email already exists",
         });
       }
-      const encrypted = await bcrypt.hash(user.password, saltRounds);
+      const encrypted = user.password;
       const user_id = uuidv4();
       const now = new Date();
       const timestamp = now.toISOString();
