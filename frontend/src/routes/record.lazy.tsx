@@ -25,10 +25,19 @@ function RouteComponent() {
     e.preventDefault();
     try {
       const winner = (e.target as HTMLFormElement).winner.value;
+      console.log(winner);
       const loser = (e.target as HTMLFormElement).loser.value;
-      const points = (e.target as HTMLFormElement).points.value;
+      console.log(loser);
+      const points = Number((e.target as HTMLFormElement).points.value);
+      console.log(points);
       const game_id = currentGameId;
-      const newRecord = { game_id, winner, loser, points };
+      console.log(currentGameId);
+      const newRecord = {
+        game_id: game_id,
+        winner: winner,
+        loser: loser,
+        points: points,
+      };
       const res = await axios.post(`${DOMAIN}/api/records`, newRecord);
       if (res.data.success) {
         setNotification("Success!");
@@ -37,6 +46,7 @@ function RouteComponent() {
       }
     } catch (err) {
       setNotification("There was an issue adding record :(");
+      console.log(err);
     }
   }
 
