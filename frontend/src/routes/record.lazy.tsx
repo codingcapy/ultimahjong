@@ -4,7 +4,7 @@ import { IoMdExit } from "react-icons/io";
 import axios from "axios";
 import DOMAIN from "../services/endpoint";
 import useGamesStore from "../store/DashboardStore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export const Route = createLazyFileRoute("/record")({
   component: RouteComponent,
@@ -15,11 +15,26 @@ function RouteComponent() {
   const { logoutService, authLoading, user } = useAuthStore((state) => state);
   const [notification, setNotification] = useState("");
   const { currentGameId } = useGamesStore((state) => state);
+  const [records, setRecords] = useState([]);
 
   function handleLogout() {
     logoutService();
     navigate({ to: "/" });
   }
+
+  useEffect(() => {
+    async function getRecords() {
+      const currentId = Number(currentGameId);
+      const res = await axios.get(`${DOMAIN}/api/records/${currentId}`);
+      //@ts-ignore
+      const newRecords = [];
+      //@ts-ignore
+      res.data.forEach((record) => newRecords.push(record));
+      //@ts-ignore
+      setRecords([...newRecords]);
+    }
+    getRecords();
+  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -41,6 +56,8 @@ function RouteComponent() {
       const res = await axios.post(`${DOMAIN}/api/records`, newRecord);
       if (res.data.success) {
         setNotification("Success!");
+        //@ts-ignore
+        setRecords([...records, res.data.record]);
       } else {
         setNotification("Failure");
       }
@@ -160,90 +177,35 @@ function RouteComponent() {
             <div>loser</div>
             <div>points won</div>
           </div>
-          <div className="grid grid-cols-4">
-            <div>January 1 2025</div>
-            <div>Rebecca</div>
-            <div>Stephanie</div>
-            <div>3</div>
-          </div>
-          <div className="grid grid-cols-4">
-            <div>January 1 2025</div>
-            <div>Rebecca</div>
-            <div>Stephanie</div>
-            <div>3</div>
-          </div>
-          <div className="grid grid-cols-4">
-            <div>January 1 2025</div>
-            <div>Rebecca</div>
-            <div>Stephanie</div>
-            <div>3</div>
-          </div>
-          <div className="grid grid-cols-4">
-            <div>January 1 2025</div>
-            <div>Rebecca</div>
-            <div>Stephanie</div>
-            <div>3</div>
-          </div>
-          <div className="grid grid-cols-4">
-            <div>January 1 2025</div>
-            <div>Rebecca</div>
-            <div>Stephanie</div>
-            <div>3</div>
-          </div>
-          <div className="grid grid-cols-4">
-            <div>January 1 2025</div>
-            <div>Rebecca</div>
-            <div>Stephanie</div>
-            <div>3</div>
-          </div>
-          <div className="grid grid-cols-4">
-            <div>January 1 2025</div>
-            <div>Rebecca</div>
-            <div>Stephanie</div>
-            <div>3</div>
-          </div>
-          <div className="grid grid-cols-4">
-            <div>January 1 2025</div>
-            <div>Rebecca</div>
-            <div>Stephanie</div>
-            <div>3</div>
-          </div>
-          <div className="grid grid-cols-4">
-            <div>January 1 2025</div>
-            <div>Rebecca</div>
-            <div>Stephanie</div>
-            <div>3</div>
-          </div>
-          <div className="grid grid-cols-4">
-            <div>January 1 2025</div>
-            <div>Rebecca</div>
-            <div>Stephanie</div>
-            <div>3</div>
-          </div>
-          <div className="grid grid-cols-4">
-            <div>January 1 2025</div>
-            <div>Rebecca</div>
-            <div>Stephanie</div>
-            <div>3</div>
-          </div>
-          <div className="grid grid-cols-4">
-            <div>January 1 2025</div>
-            <div>Rebecca</div>
-            <div>Stephanie</div>
-            <div>3</div>
-          </div>
-          <div className="grid grid-cols-4">
-            <div>January 1 2025</div>
-            <div>Rebecca</div>
-            <div>Stephanie</div>
-            <div>3</div>
-          </div>
-          <div className="grid grid-cols-4">
-            <div>January 1 2025</div>
-            <div>Rebecca</div>
-            <div>Stephanie</div>
-            <div>3</div>
-          </div>
+          {records.map((record) => (
+            //@ts-ignore
+            <div className="grid grid-cols-4" key={record.record_id}>
+              <div>
+                {
+                  //@ts-ignore
+                  record.created_at
+                }
+              </div>
+              <div>
+                {
+                  //@ts-ignore
+                  record.winner
+                }
+              </div>
+              <div>
+                {
+                  //@ts-ignore
+                  record.loser
+                }
+              </div>
+              <div>
+                {
+                  //@ts-ignore
+                  record.points
+                }
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </main>

@@ -44,6 +44,15 @@ export const gamesRoute = new Hono()
     }
   })
   .get("/", async (c) => {
-    const incomingGames = await db.select().from(games);
-    return c.json(incomingGames);
+    try {
+      const incomingGames = await db.select().from(games);
+      return c.json(incomingGames);
+    } catch (err) {
+      console.log(err);
+      c.status(500);
+      return c.json({
+        success: false,
+        message: "Internal Server Error: could not get games",
+      });
+    }
   });
