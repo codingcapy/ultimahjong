@@ -25,10 +25,9 @@ function RouteComponent() {
     e.preventDefault();
     const email = (e.target as HTMLFormElement).email.value;
     const password = (e.target as HTMLFormElement).password.value;
-    console.log(email);
-    console.log(password);
     if (!email || !password) return;
     loginService(email, password);
+    if (authLoading) setNotification("Loading...");
     if (!user) {
       setTimeout(() => {
         setNotification("Invalid login credentials");
