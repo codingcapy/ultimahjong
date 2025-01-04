@@ -19,11 +19,14 @@ export const Route = createLazyFileRoute("/dashboard")({
 });
 
 function RouteComponent() {
+    const { user } = useAuthStore((state) => state);
     const { games, setGames, currentGameId, setCurrentGameId } = useGamesStore(
         (state) => state
     );
+    const navigate = useNavigate();
 
     useEffect(() => {
+        if (!user) navigate({ to: "/" });
         async function getGames() {
             const res = await axios.get(`${DOMAIN}/api/games`);
             const newGames: Game[] = [];

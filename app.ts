@@ -10,22 +10,28 @@ import { recordsRoute } from "./routes/records";
 const app = new Hono();
 
 app.use("*", logger());
-
-app.use("*", serveStatic({ root: "./frontend/dist" }));
-app.use("*", serveStatic({ root: "./frontend/dist/index.html" }));
-
 app.use("*", cors());
 
-app.get("/", (c) => {
-  c.status(200);
-  return c.newResponse("welcome");
+// Serve static assets (CSS, JS, images, etc.)
+app.use("/*", serveStatic({ root: "./frontend/dist" }));
+
+// Serve `index.html` for non-API routes
+app.get("/*", async (c) => {
+    try {
+        const indexHtml = await Bun.file("./frontend/dist/index.html").text();
+        return c.html(indexHtml);
+    } catch (error) {
+        console.error("Error reading index.html:", error);
+        return c.text("Internal Server Error", 500);
+    }
 });
 
+// API routes
 const apiRoutes = app
-  .basePath("/api")
-  .route("/users", usersRoute)
-  .route("/user", userRoute)
-  .route("/games", gamesRoute)
-  .route("/records", recordsRoute);
+    .basePath("/api")
+    .route("/users", usersRoute)
+    .route("/user", userRoute)
+    .route("/games", gamesRoute)
+    .route("/records", recordsRoute);
 
 export default app;
