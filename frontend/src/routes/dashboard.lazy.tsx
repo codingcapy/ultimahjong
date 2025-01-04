@@ -30,6 +30,7 @@ function RouteComponent() {
         async function getGames() {
             const res = await axios.get(`${DOMAIN}/api/games`);
             const newGames: Game[] = [];
+            console.log(res.data);
             //@ts-ignore
             res.data.forEach((game) => newGames.push(game));
             //@ts-ignore
@@ -44,12 +45,11 @@ function RouteComponent() {
                 <SideNav />
                 <div className="w-[100%] bg-gray-700 h-screen p-10">
                     <div className="md:grid grid-cols-5 gap-3">
-                        {
+                        {games &&
                             //@ts-ignore
                             games.map((game) => (
                                 <Game game={game} key={game.game_id} />
-                            ))
-                        }
+                            ))}
                     </div>
                 </div>
             </div>

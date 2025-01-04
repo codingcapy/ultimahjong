@@ -12,6 +12,14 @@ const app = new Hono();
 app.use("*", logger());
 app.use("*", cors());
 
+// API routes
+const apiRoutes = app
+    .basePath("/api")
+    .route("/users", usersRoute)
+    .route("/user", userRoute)
+    .route("/games", gamesRoute)
+    .route("/records", recordsRoute);
+
 // Serve static assets (CSS, JS, images, etc.)
 app.use("/*", serveStatic({ root: "./frontend/dist" }));
 
@@ -25,13 +33,5 @@ app.get("/*", async (c) => {
         return c.text("Internal Server Error", 500);
     }
 });
-
-// API routes
-const apiRoutes = app
-    .basePath("/api")
-    .route("/users", usersRoute)
-    .route("/user", userRoute)
-    .route("/games", gamesRoute)
-    .route("/records", recordsRoute);
 
 export default app;
