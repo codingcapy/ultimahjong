@@ -95,7 +95,7 @@ export default function Game(props: GameProps) {
                         <span className="text-[#D2B1FD]">
                             {props.game.year}
                         </span>
-                        . This <br /> prototype will be gone forever.
+                        . This <br /> game will be gone forever.
                     </div>
                     <div className="mx-auto py-2">
                         <form onSubmit={handleDeleteProject}>
@@ -180,7 +180,7 @@ export default function Game(props: GameProps) {
                     )}
                     <div className="flex my-2">
                         <div
-                            className="pl-2 text-[#D2B1FC] cursor-pointer"
+                            className="text-[#D2B1FC] cursor-pointer"
                             onClick={() => setDeleteMode(true)}
                         >
                             Delete

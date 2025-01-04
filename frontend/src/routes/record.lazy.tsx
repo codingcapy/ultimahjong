@@ -7,6 +7,7 @@ import useGamesStore from "../store/DashboardStore";
 import { useEffect, useState } from "react";
 import { LuEllipsisVertical } from "react-icons/lu";
 import TopNav from "../components/TopNav";
+import Record from "../components/record/Record";
 
 export const Route = createLazyFileRoute("/record")({
     component: RouteComponent,
@@ -160,23 +161,23 @@ function RouteComponent() {
                     </div>
                     <div className="grid grid-cols-3">
                         <div>Popo</div>
-                        <div>61</div>
-                        <div>$10</div>
+                        <div>200</div>
+                        <div>$20</div>
                     </div>
                     <div className="grid grid-cols-3">
                         <div>Rebecca</div>
-                        <div>43</div>
-                        <div>$8</div>
+                        <div>200</div>
+                        <div>$20</div>
                     </div>
                     <div className="grid grid-cols-3">
                         <div>Stephanie</div>
-                        <div>1</div>
-                        <div>$0.1</div>
+                        <div>200</div>
+                        <div>$20</div>
                     </div>
                     <div className="grid grid-cols-3">
                         <div>Justin</div>
-                        <div>-10</div>
-                        <div>$-0.1</div>
+                        <div>200</div>
+                        <div>$20</div>
                     </div>
                     <h2 className="text-center text-xl font-bold mt-10 mb-2">
                         Records
@@ -191,41 +192,7 @@ function RouteComponent() {
                         <div>points won</div>
                     </div>
                     {records.map((record) => (
-                        <div
-                            className="grid grid-cols-5"
-                            key={
-                                //@ts-ignore
-                                record.record_id
-                            }
-                        >
-                            <div>
-                                {
-                                    //@ts-ignore
-                                    record.created_at.slice(0, 10)
-                                }
-                            </div>
-                            <div>
-                                {
-                                    //@ts-ignore
-                                    record.winner
-                                }
-                            </div>
-                            <div>
-                                {
-                                    //@ts-ignore
-                                    record.loser
-                                }
-                            </div>
-                            <div>
-                                {
-                                    //@ts-ignore
-                                    record.points
-                                }
-                            </div>
-                            <div className="py-2">
-                                <LuEllipsisVertical />
-                            </div>
-                        </div>
+                        <Record record={record} />
                     ))}
                 </div>
             </div>
