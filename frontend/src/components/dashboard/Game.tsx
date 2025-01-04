@@ -60,10 +60,10 @@ export default function Game(props: GameProps) {
                 console.log(props.game.game_id);
                 console.log(currentGameId);
             }}
-            onMouseEnter={() => setShowOverlay(true)}
+            onMouseEnter={() => window.innerWidth > 500 && setShowOverlay(true)}
             onMouseLeave={() => {
-                setShowOverlay(false);
-                setShowMenu(false);
+                window.innerWidth > 500 && setShowOverlay(false);
+                window.innerWidth > 500 && setShowMenu(false);
             }}
             key={props.game.game_id}
         >
@@ -77,14 +77,14 @@ export default function Game(props: GameProps) {
             </Link>
             {showOverlay && (
                 <div
-                    className="absolute right-0 top-0 p-3 cursor-pointer"
+                    className="absolute right-0 top-0 p-3 cursor-pointer z-10"
                     onClick={toggleMenu}
                 >
                     <LuEllipsisVertical />
                 </div>
             )}
             {showMenu && (
-                <div className="absolute right-5 top-10 bg-[#242424] border border-[#373541] rounded-xl py-5 px-5">
+                <div className="absolute right-5 top-10 bg-[#242424] border border-[#373541] rounded-xl py-5 px-5 z-10">
                     <div
                         className="pb-1 cursor-pointer"
                         onClick={() => setEditMode(true)}

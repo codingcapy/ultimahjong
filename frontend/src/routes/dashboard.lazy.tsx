@@ -6,6 +6,7 @@ import axios from "axios";
 import DOMAIN from "../services/endpoint";
 import useGamesStore from "../store/DashboardStore";
 import Game from "../components/dashboard/Game";
+import TopNav from "../components/TopNav";
 
 export type Game = {
     game_id: number;
@@ -41,6 +42,7 @@ function RouteComponent() {
 
     return (
         <main className="flex-1 text-white">
+            <TopNav />
             <div className="flex">
                 <SideNav />
                 <div className="w-[100%] bg-gray-700 h-screen p-10">

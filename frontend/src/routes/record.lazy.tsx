@@ -5,6 +5,8 @@ import axios from "axios";
 import DOMAIN from "../services/endpoint";
 import useGamesStore from "../store/DashboardStore";
 import { useEffect, useState } from "react";
+import { LuEllipsisVertical } from "react-icons/lu";
+import TopNav from "../components/TopNav";
 
 export const Route = createLazyFileRoute("/record")({
     component: RouteComponent,
@@ -73,6 +75,7 @@ function RouteComponent() {
 
     return (
         <main className="flex-1 text-white">
+            <TopNav />
             <div className="flex">
                 <div className="hidden md:fixed w-[12%] h-screen bg-black text-white md:flex flex-col justify-between">
                     <div className="pt-10 text-center">
@@ -181,7 +184,7 @@ function RouteComponent() {
                     <h2 className="text-sm text-center mb-2">
                         All records for 2025
                     </h2>
-                    <div className="bg-gray-500 grid grid-cols-4">
+                    <div className="bg-gray-500 grid grid-cols-5">
                         <div>date</div>
                         <div>winner</div>
                         <div>loser</div>
@@ -189,7 +192,7 @@ function RouteComponent() {
                     </div>
                     {records.map((record) => (
                         <div
-                            className="grid grid-cols-4"
+                            className="grid grid-cols-5"
                             key={
                                 //@ts-ignore
                                 record.record_id
@@ -198,7 +201,7 @@ function RouteComponent() {
                             <div>
                                 {
                                     //@ts-ignore
-                                    record.created_at
+                                    record.created_at.slice(0, 10)
                                 }
                             </div>
                             <div>
@@ -218,6 +221,9 @@ function RouteComponent() {
                                     //@ts-ignore
                                     record.points
                                 }
+                            </div>
+                            <div className="py-2">
+                                <LuEllipsisVertical />
                             </div>
                         </div>
                     ))}
