@@ -52,6 +52,24 @@ export default function Game(props: GameProps) {
         }
     }
 
+    async function handleDeleteProject(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        try {
+            await axios.post(`${DOMAIN}/api/games/${props.game.game_id}`);
+            const res = await axios.get(`${DOMAIN}/api/games`);
+            const newGames: Game[] = [];
+            console.log(res.data);
+            //@ts-ignore
+            res.data.forEach((game) => newGames.push(game));
+            //@ts-ignore
+            setGames([...newGames]);
+            setEditMode(false);
+            setShowMenu(false);
+        } catch (error) {
+            console.error("Error deleting project:", error);
+        }
+    }
+
     return (
         <div
             className="relative"
@@ -67,6 +85,47 @@ export default function Game(props: GameProps) {
             }}
             key={props.game.game_id}
         >
+            {deleteMode && (
+                <div className="fixed z-[201] py-5 px-2 md:px-5 rounded-lg bg-[#1A1A1A] top-[20%] md:top-[10%] left-[5%] md:left-[35%] flex flex-col w-[90%]">
+                    <div className="text-xl py-5 font-bold ">
+                        Delete For Eternity
+                    </div>
+                    <div className="">
+                        You are about to permanently delete{" "}
+                        <span className="text-[#D2B1FD]">
+                            {props.game.year}
+                        </span>
+                        . This <br /> prototype will be gone forever.
+                    </div>
+                    <div className="mx-auto py-2">
+                        <form onSubmit={handleDeleteProject}>
+                            <input
+                                name="content"
+                                id="content"
+                                defaultValue="[this message was deleted]"
+                                className="hidden"
+                            />
+                            <div className="flex md:pl-64">
+                                <button
+                                    className="md:block md:pb-1 edit-btn cursor-pointer px-5 py-2 md:my-2 mx-2 bg-[#BABABA] rounded hover:bg-[#fafafa] transition-all ease duration-300 text-black tracking-widest"
+                                    onClick={() => setDeleteMode(false)}
+                                >
+                                    CANCEL
+                                </button>
+                                <button className="md:block delete-btn cursor-pointer px-5 py-2 md:my-2 bg-[#DD4B63] rounded hover:bg-red-600 transition-all ease duration-300 tracking-widest">
+                                    DELETE
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+            {deleteMode && (
+                <div
+                    className="fixed inset-0 bg-black z-[200] opacity-70"
+                    onClick={() => setDeleteMode(false)}
+                ></div>
+            )}
             <Link to="/record">
                 <div
                     className="py-10 bg-gray-600 text-center text-white my-2 md:my-0"

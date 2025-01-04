@@ -48,10 +48,13 @@ function RouteComponent() {
                 <div className="w-[100%] bg-gray-700 h-screen p-10">
                     <div className="md:grid grid-cols-5 gap-3">
                         {games &&
-                            //@ts-ignore
-                            games.map((game) => (
-                                <Game game={game} key={game.game_id} />
-                            ))}
+                            games.map(
+                                //@ts-ignore
+                                (game) =>
+                                    game.active && (
+                                        <Game game={game} key={game.game_id} />
+                                    )
+                            )}
                     </div>
                 </div>
             </div>

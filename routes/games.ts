@@ -35,6 +35,7 @@ export const gamesRoute = new Hono()
             await db.insert(games).values({
                 year: game.year,
                 created_at: timestamp,
+                active: true,
             });
             return c.json({
                 success: true,
@@ -55,12 +56,33 @@ export const gamesRoute = new Hono()
             const game_id = Number.parseInt(c.req.param("game_id"));
             const data = await c.req.valid("json");
             const game = updateGameSchema.parse(data);
-            const now = new Date();
-            const timestamp = now.toISOString();
             await db
                 .update(games)
                 .set({
                     year: game.year,
+                })
+                .where(eq(games.game_id, game_id));
+            return c.json({
+                success: true,
+                message: "Success! Redirecting...",
+            });
+        } catch (err) {
+            console.log(err);
+            c.status(500);
+            return c.json({
+                success: false,
+                message: "Internal Server Error: could not create game",
+            });
+        }
+    })
+    .post("/:game_id", async (c) => {
+        console.log("function running");
+        try {
+            const game_id = Number.parseInt(c.req.param("game_id"));
+            await db
+                .update(games)
+                .set({
+                    active: false,
                 })
                 .where(eq(games.game_id, game_id));
             return c.json({
