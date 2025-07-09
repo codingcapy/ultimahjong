@@ -1,14 +1,14 @@
-import { createLazyFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import mjimg2 from "/mjimg2.jpg";
 import { useState } from "react";
 import useAuthStore from "../store/AuthStore";
-import axios from "axios";
 import DOMAIN from "../services/endpoint";
 import { LuEye } from "react-icons/lu";
 import { LuEyeClosed } from "react-icons/lu";
 import { useCreateUserMutation } from "../lib/api/users";
+import { useQueryClient } from "@tanstack/react-query";
 
-export const Route = createLazyFileRoute("/register")({
+export const Route = createFileRoute("/register")({
     component: RouteComponent,
 });
 

@@ -13,22 +13,16 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as RegisterImport } from './routes/register'
 
 // Create Virtual Routes
 
-const RegisterLazyImport = createFileRoute('/register')()
 const RecordLazyImport = createFileRoute('/record')()
 const DashboardLazyImport = createFileRoute('/dashboard')()
 const AboutLazyImport = createFileRoute('/about')()
 const IndexLazyImport = createFileRoute('/')()
 
 // Create/Update Routes
-
-const RegisterLazyRoute = RegisterLazyImport.update({
-  id: '/register',
-  path: '/register',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/register.lazy').then((d) => d.Route))
 
 const RecordLazyRoute = RecordLazyImport.update({
   id: '/record',
@@ -48,6 +42,12 @@ const AboutLazyRoute = AboutLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/about.lazy').then((d) => d.Route))
 
+const RegisterRoute = RegisterImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const IndexLazyRoute = IndexLazyImport.update({
   id: '/',
   path: '/',
@@ -63,6 +63,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterImport
       parentRoute: typeof rootRoute
     }
     '/about': {
@@ -86,13 +93,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RecordLazyImport
       parentRoute: typeof rootRoute
     }
-    '/register': {
-      id: '/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof RegisterLazyImport
-      parentRoute: typeof rootRoute
-    }
   }
 }
 
@@ -100,52 +100,52 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
+  '/register': typeof RegisterRoute
   '/about': typeof AboutLazyRoute
   '/dashboard': typeof DashboardLazyRoute
   '/record': typeof RecordLazyRoute
-  '/register': typeof RegisterLazyRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
+  '/register': typeof RegisterRoute
   '/about': typeof AboutLazyRoute
   '/dashboard': typeof DashboardLazyRoute
   '/record': typeof RecordLazyRoute
-  '/register': typeof RegisterLazyRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
+  '/register': typeof RegisterRoute
   '/about': typeof AboutLazyRoute
   '/dashboard': typeof DashboardLazyRoute
   '/record': typeof RecordLazyRoute
-  '/register': typeof RegisterLazyRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/dashboard' | '/record' | '/register'
+  fullPaths: '/' | '/register' | '/about' | '/dashboard' | '/record'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/dashboard' | '/record' | '/register'
-  id: '__root__' | '/' | '/about' | '/dashboard' | '/record' | '/register'
+  to: '/' | '/register' | '/about' | '/dashboard' | '/record'
+  id: '__root__' | '/' | '/register' | '/about' | '/dashboard' | '/record'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
+  RegisterRoute: typeof RegisterRoute
   AboutLazyRoute: typeof AboutLazyRoute
   DashboardLazyRoute: typeof DashboardLazyRoute
   RecordLazyRoute: typeof RecordLazyRoute
-  RegisterLazyRoute: typeof RegisterLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
+  RegisterRoute: RegisterRoute,
   AboutLazyRoute: AboutLazyRoute,
   DashboardLazyRoute: DashboardLazyRoute,
   RecordLazyRoute: RecordLazyRoute,
-  RegisterLazyRoute: RegisterLazyRoute,
 }
 
 export const routeTree = rootRoute
@@ -159,14 +159,17 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/register",
         "/about",
         "/dashboard",
-        "/record",
-        "/register"
+        "/record"
       ]
     },
     "/": {
       "filePath": "index.lazy.tsx"
+    },
+    "/register": {
+      "filePath": "register.tsx"
     },
     "/about": {
       "filePath": "about.lazy.tsx"
@@ -176,9 +179,6 @@ export const routeTree = rootRoute
     },
     "/record": {
       "filePath": "record.lazy.tsx"
-    },
-    "/register": {
-      "filePath": "register.lazy.tsx"
     }
   }
 }

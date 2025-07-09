@@ -2,7 +2,7 @@ import ReactDOM from "react-dom/client";
 import { Link, RouterProvider, createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 import Auth from "./components/auth/Auth";
-import { QueryClient } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 export const queryClient = new QueryClient();
 
@@ -40,8 +40,10 @@ const rootElement = document.getElementById("root")!;
 if (!rootElement.innerHTML) {
     const root = ReactDOM.createRoot(rootElement);
     root.render(
-        <Auth>
-            <RouterProvider router={router} />
-        </Auth>
+        <QueryClientProvider client={queryClient}>
+            <Auth>
+                <RouterProvider router={router} />
+            </Auth>
+        </QueryClientProvider>
     );
 }
