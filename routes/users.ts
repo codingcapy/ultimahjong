@@ -21,7 +21,13 @@ async function hashPassword(password: string) {
 export const usersRoute = new Hono()
     .post(
         "/",
-        zValidator("json", createInsertSchema(usersTable)),
+        zValidator(
+            "json",
+            createInsertSchema(usersTable).omit({
+                userId: true,
+                createdAt: true,
+            })
+        ),
         async (c) => {
             const data = c.req.valid("json");
             if (data.password.length > 80) {
