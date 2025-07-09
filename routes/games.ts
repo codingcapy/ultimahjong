@@ -1,9 +1,10 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
-import { db, games, users } from "../connect";
+import { db } from "../connect";
+import { games as gamesTable } from "../schema/games";
 import { eq } from "drizzle-orm";
-import { v4 as uuidv4 } from "uuid";
+import { createInsertSchema } from "drizzle-zod";
 
 const gameSchema = z.object({
     game_id: z.number(),
@@ -25,31 +26,34 @@ const updateGameSchema = gameSchema.omit({
 });
 
 export const gamesRoute = new Hono()
-    .post("/", zValidator("json", createGameSchema), async (c) => {
-        console.log("function running");
-        try {
-            const data = await c.req.valid("json");
-            const game = createGameSchema.parse(data);
-            const now = new Date();
-            const timestamp = now.toISOString();
-            await db.insert(games).values({
-                year: game.year,
-                created_at: timestamp,
-                active: true,
-            });
-            return c.json({
-                success: true,
-                message: "Success! Redirecting...",
-            });
-        } catch (err) {
-            console.log(err);
-            c.status(500);
-            return c.json({
-                success: false,
-                message: "Internal Server Error: could not create game",
-            });
+    .post(
+        "/",
+        zValidator("json", createInsertSchema(gamesTable)),
+        async (c) => {
+            console.log("function running");
+            try {
+                const data = c.req.valid("json");
+                const game = createGameSchema.parse(data);
+                const now = new Date();
+                const timestamp = now.toISOString();
+                await db.insert(gamesTable).values({
+                    year: game.year,
+                    active: true,
+                });
+                return c.json({
+                    success: true,
+                    message: "Success! Redirecting...",
+                });
+            } catch (err) {
+                console.log(err);
+                c.status(500);
+                return c.json({
+                    success: false,
+                    message: "Internal Server Error: could not create game",
+                });
+            }
         }
-    })
+    )
     .patch("/:game_id", zValidator("json", createGameSchema), async (c) => {
         console.log("function running");
         try {
@@ -57,11 +61,11 @@ export const gamesRoute = new Hono()
             const data = await c.req.valid("json");
             const game = updateGameSchema.parse(data);
             await db
-                .update(games)
+                .update(gamesTable)
                 .set({
                     year: game.year,
                 })
-                .where(eq(games.game_id, game_id));
+                .where(eq(gamesTable.gameId, game_id));
             return c.json({
                 success: true,
                 message: "Success! Redirecting...",
@@ -80,11 +84,11 @@ export const gamesRoute = new Hono()
         try {
             const game_id = Number.parseInt(c.req.param("game_id"));
             await db
-                .update(games)
+                .update(gamesTable)
                 .set({
                     active: false,
                 })
-                .where(eq(games.game_id, game_id));
+                .where(eq(gamesTable.gameId, game_id));
             return c.json({
                 success: true,
                 message: "Success! Redirecting...",
@@ -100,7 +104,7 @@ export const gamesRoute = new Hono()
     })
     .get("/", async (c) => {
         try {
-            const incomingGames = await db.select().from(games);
+            const incomingGames = await db.select().from(gamesTable);
             return c.json(incomingGames);
         } catch (err) {
             console.log(err);

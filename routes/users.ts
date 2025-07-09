@@ -1,12 +1,14 @@
 import { zValidator } from "@hono/zod-validator";
+import { createInsertSchema } from "drizzle-zod";
 import { Hono } from "hono";
-import { z } from "zod";
-import { db, users as usersTable } from "../connect";
+import { db } from "../connect";
+import { users as usersTable } from "../schema/users";
 import { eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { promisify } from "util";
 import { randomBytes, scrypt } from "crypto";
-import { createInsertSchema } from "drizzle-zod";
+import { mightFail } from "might-fail";
+import { HTTPException } from "hono/http-exception";
 
 const scryptAsync = promisify(scrypt);
 
@@ -16,77 +18,84 @@ async function hashPassword(password: string) {
     return `${salt}:${derivedKey.toString("hex")}`;
 }
 
-const userSchema = z.object({
-    user_id: z.string(),
-    email: z.string(),
-    password: z.string(),
-    created_at: z.string(),
-});
-
-const createUserSchema = userSchema.omit({
-    user_id: true,
-    created_at: true,
-});
-
-export const usersRoute = new Hono().post(
-    "/",
-    zValidator("json", createInsertSchema(usersTable)),
-    async (c) => {
-        console.log("function running");
-        try {
-            const data = await c.req.valid("json");
+export const usersRoute = new Hono()
+    .post(
+        "/",
+        zValidator("json", createInsertSchema(usersTable)),
+        async (c) => {
+            const data = c.req.valid("json");
             if (data.password.length > 80) {
                 return c.json({
+                    user: null,
                     success: false,
                     message: "password max char limit is 80",
                 });
             }
             if (data.email.length > 255) {
-                return c.json({
-                    success: false,
-                    message: "email max char limit is 255",
+                return c.json(
+                    {
+                        user: null,
+                        success: false,
+                        message: "email max char limit is 255",
+                    },
+                    400
+                );
+            }
+            const { error: emailQueryError, result: emailQueryResult } =
+                await mightFail(
+                    await db
+                        .select()
+                        .from(usersTable)
+                        .where(eq(usersTable.email, data.email))
+                );
+            if (emailQueryError) {
+                throw new HTTPException(500, {
+                    message: "Error while fetching user",
+                    cause: emailQueryResult,
                 });
             }
-            const emailQuery = await db
-                .select()
-                .from(usersTable)
-                .where(eq(usersTable.email, data.email));
-            if (emailQuery.length > 0) {
-                return c.json({
-                    success: false,
-                    message:
-                        "An account associated with this email already exists",
-                });
+            if (emailQueryResult.length > 0) {
+                return c.json(
+                    {
+                        user: null,
+                        success: false,
+                        message:
+                            "An account associated with this email already exists",
+                    },
+                    400
+                );
             }
             const encrypted = await hashPassword(data.password);
-            const user_id = uuidv4();
-            const now = new Date();
-            const timestamp = now.toISOString();
-            //@ts-ignore
-            await db.insert(users).values({
-                user_id,
-                email: data.email,
-                password: encrypted,
-                created_at: timestamp,
-            });
-            const userQuery = await db
-                .select()
-                .from(usersTable)
-                .where(eq(usersTable.email, data.email));
-            // const newUser = userQuery[0];
-            // sendVerificationEmail(newUser)
-            c.status(200);
-            return c.json({
-                success: true,
-                message: "Success! Redirecting...",
-            });
-        } catch (err) {
-            console.log(err);
-            c.status(500);
-            return c.json({
-                success: false,
-                message: "Internal Server Error: could not create user",
+            const userId = uuidv4();
+            const { error: userInsertError, result: userInsertResult } =
+                await mightFail(
+                    await db
+                        .insert(usersTable)
+                        .values({
+                            userId,
+                            email: data.email,
+                            password: encrypted,
+                        })
+                        .returning()
+                );
+            if (userInsertError) {
+                console.log("Error while creating user");
+                throw new HTTPException(500, {
+                    message: "Error while creating user",
+                    cause: userInsertResult,
+                });
+            }
+            return c.json({ user: userInsertResult[0] }, 200);
+        }
+    )
+    .get(async (c) => {
+        const { error: usersQueryError, result: usersQueryResult } =
+            await mightFail(db.select().from(usersTable));
+        if (usersQueryError) {
+            throw new HTTPException(500, {
+                message: "Error while fetching users",
+                cause: usersQueryError,
             });
         }
-    }
-);
+        return c.json({ users: usersQueryResult }, 200);
+    });

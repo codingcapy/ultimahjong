@@ -34,4 +34,5 @@ app.get("/*", async (c) => {
     }
 });
 
+export type ApiRoutes = typeof apiRoutes;
 export default app;

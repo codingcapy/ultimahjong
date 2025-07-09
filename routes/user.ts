@@ -1,7 +1,8 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
-import { db, users as usersTable } from "../connect";
+import { db } from "../connect";
+import { users as usersTable } from "../schema/users";
 import { eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 import { promisify } from "util";
@@ -22,8 +23,8 @@ export const userRoute = new Hono()
         zValidator(
             "json",
             createInsertSchema(usersTable).omit({
-                user_id: true,
-                created_at: true,
+                userId: true,
+                createdAt: true,
             })
         ),
         async (c) => {
@@ -44,7 +45,7 @@ export const userRoute = new Hono()
                     return c.json({ result: { user: null, token: null } });
                 }
                 const token = jwt.sign(
-                    { id: user.user_id },
+                    { id: user.userId },
                     process.env.JWT_SECRET || "default_secret",
                     { expiresIn: "14 days" }
                 );
@@ -69,7 +70,7 @@ export const userRoute = new Hono()
                 .select()
                 .from(usersTable)
                 //@ts-ignore
-                .where(eq(users.user_id, decodedUser.id));
+                .where(eq(usersTable.userId, decodedUser.id));
             const user = response[0];
             return c.json({ result: { user, token } });
         } catch (err) {
