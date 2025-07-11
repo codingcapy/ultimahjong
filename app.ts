@@ -10,7 +10,22 @@ import { recordsRoute } from "./routes/records";
 const app = new Hono();
 
 app.use("*", logger());
-app.use("*", cors());
+app.use(
+    "*",
+    cors({
+        origin: (origin) => {
+            // Allow requests from your local dev and production frontend
+            const allowedOrigins = [
+                "http://localhost:5173",
+                "https://ultimahjong-production-3fbe.up.railway.app/",
+            ];
+            return origin && allowedOrigins.includes(origin) ? origin : "";
+        },
+        allowHeaders: ["Content-Type", "Authorization"],
+        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        credentials: true,
+    })
+);
 
 // API routes
 const apiRoutes = app

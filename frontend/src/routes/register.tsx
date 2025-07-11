@@ -1,12 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import mjimg2 from "/mjimg2.jpg";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useAuthStore from "../store/AuthStore";
 import DOMAIN from "../services/endpoint";
 import { LuEye } from "react-icons/lu";
 import { LuEyeClosed } from "react-icons/lu";
 import { useCreateUserMutation } from "../lib/api/users";
-import { useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/register")({
     component: RouteComponent,
@@ -19,16 +18,16 @@ function RouteComponent() {
     const [showPassword, setShowPassword] = useState(false);
     const { mutate: createUser } = useCreateUserMutation();
 
+    useEffect(() => {
+        if (!!user) {
+            navigate({ to: "/dashboard" });
+        }
+    }, [user]);
+
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        console.log(DOMAIN);
-        // const token = captchaRef.current.getValue();
-        // captchaRef.current.reset();
-        // if (!token)
-        //     return setNotification("Please confirm that you are human!");
         const email = (e.target as HTMLFormElement).email.value;
         const password = (e.target as HTMLFormElement).password.value;
-        console.log(email, password);
         createUser(
             { email, password },
             {
