@@ -17,7 +17,7 @@ app.use(
             // Allow requests from your local dev and production frontend
             const allowedOrigins = [
                 "http://localhost:5173",
-                "https://ultimahjong-production-3fbe.up.railway.app/",
+                "https://ultimahjong-production-3fbe.up.railway.app",
             ];
             return origin && allowedOrigins.includes(origin) ? origin : "";
         },
