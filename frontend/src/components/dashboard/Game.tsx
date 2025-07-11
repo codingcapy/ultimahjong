@@ -4,24 +4,17 @@ import { useState } from "react";
 import { LuEllipsisVertical } from "react-icons/lu";
 import axios from "axios";
 import DOMAIN from "../../services/endpoint";
+import { Game } from "../../../../schema/games";
 
-type Game = {
-    game_id: number;
-    year: string;
-};
-
-type GameProps = {
-    game: Game;
-};
-
-export default function Game(props: GameProps) {
+export default function GameComponent(props: { game: Game }) {
+    const { game } = props;
     const [showOverlay, setShowOverlay] = useState(
         window.innerWidth < 500 ? true : false
     );
     const [showMenu, setShowMenu] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [deleteMode, setDeleteMode] = useState(false);
-    const [projectTitle, setProjectTitle] = useState(props.game.year);
+    const [projectTitle, setProjectTitle] = useState(game.year || "");
     const { games, setGames, currentGameId, setCurrentGameId } = useGamesStore(
         (state) => state
     );
@@ -32,50 +25,45 @@ export default function Game(props: GameProps) {
 
     async function handleUpdateTitle(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        //@ts-ignore
-        const newTitle = (e.target as HTMLFormElement).title.value;
-        try {
-            await axios.patch(`${DOMAIN}/api/games/${props.game.game_id}`, {
-                year: newTitle,
-            });
-            const res = await axios.get(`${DOMAIN}/api/games`);
-            const newGames: Game[] = [];
-            console.log(res.data);
-            //@ts-ignore
-            res.data.forEach((game) => newGames.push(game));
-            //@ts-ignore
-            setGames([...newGames]);
-            setEditMode(false);
-            setShowMenu(false);
-        } catch (error) {
-            console.error("Error updating project title:", error);
-        }
+        const newTitle = (e.target as HTMLFormElement).projecttitle.value;
+        // try {
+        //     await axios.patch(`${DOMAIN}/api/games/${props.game.gameId}`, {
+        //         year: newTitle,
+        //     });
+        //     const res = await axios.get(`${DOMAIN}/api/games`);
+        //     const newGames: Game[] = [];
+        //     console.log(res.data);
+        //     res.data.forEach((game) => newGames.push(game));
+        //     setGames([...newGames]);
+        //     setEditMode(false);
+        //     setShowMenu(false);
+        // } catch (error) {
+        //     console.error("Error updating project title:", error);
+        // }
     }
 
     async function handleDeleteProject(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        try {
-            await axios.post(`${DOMAIN}/api/games/${props.game.game_id}`);
-            const res = await axios.get(`${DOMAIN}/api/games`);
-            const newGames: Game[] = [];
-            console.log(res.data);
-            //@ts-ignore
-            res.data.forEach((game) => newGames.push(game));
-            //@ts-ignore
-            setGames([...newGames]);
-            setEditMode(false);
-            setShowMenu(false);
-        } catch (error) {
-            console.error("Error deleting project:", error);
-        }
+        // try {
+        //     await axios.post(`${DOMAIN}/api/games/${props.game.gameId}`);
+        //     const res = await axios.get(`${DOMAIN}/api/games`);
+        //     const newGames: Game[] = [];
+        //     console.log(res.data);
+        //     res.data.forEach((game) => newGames.push(game));
+        //     setGames([...newGames]);
+        //     setEditMode(false);
+        //     setShowMenu(false);
+        // } catch (error) {
+        //     console.error("Error deleting project:", error);
+        // }
     }
 
     return (
         <div
             className="relative"
             onClick={() => {
-                setCurrentGameId(props.game.game_id);
-                console.log(props.game.game_id);
+                setCurrentGameId(props.game.gameId);
+                console.log(props.game.gameId);
                 console.log(currentGameId);
             }}
             onMouseEnter={() => window.innerWidth > 500 && setShowOverlay(true)}
@@ -83,7 +71,7 @@ export default function Game(props: GameProps) {
                 window.innerWidth > 500 && setShowOverlay(false);
                 window.innerWidth > 500 && setShowMenu(false);
             }}
-            key={props.game.game_id}
+            key={props.game.gameId}
         >
             {deleteMode && (
                 <div className="fixed z-[201] py-5 px-2 md:px-5 rounded-lg bg-[#1A1A1A] top-[20%] md:top-[10%] left-[5%] md:left-[35%] flex flex-col w-[90%]">
@@ -129,7 +117,7 @@ export default function Game(props: GameProps) {
             <Link to="/record">
                 <div
                     className="py-10 bg-gray-600 text-center text-white my-2 md:my-0"
-                    key={props.game.game_id}
+                    key={props.game.gameId}
                 >
                     {props.game.year}
                 </div>
@@ -157,8 +145,8 @@ export default function Game(props: GameProps) {
                                 className="flex flex-col"
                             >
                                 <input
-                                    name="title"
-                                    id="title"
+                                    name="projecttitle"
+                                    id="projecttitle"
                                     type="text"
                                     value={projectTitle}
                                     onChange={(e) =>

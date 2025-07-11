@@ -5,6 +5,8 @@ import { db } from "../connect";
 import { games as gamesTable } from "../schema/games";
 import { eq } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
+import { mightFail } from "might-fail";
+import { HTTPException } from "hono/http-exception";
 
 const gameSchema = z.object({
     game_id: z.number(),
@@ -28,37 +30,40 @@ const updateGameSchema = gameSchema.omit({
 export const gamesRoute = new Hono()
     .post(
         "/",
-        zValidator("json", createInsertSchema(gamesTable)),
+        zValidator(
+            "json",
+            createInsertSchema(gamesTable).omit({
+                gameId: true,
+                createdAt: true,
+            })
+        ),
         async (c) => {
-            console.log("function running");
-            try {
-                const data = c.req.valid("json");
-                const game = createGameSchema.parse(data);
-                const now = new Date();
-                const timestamp = now.toISOString();
-                await db.insert(gamesTable).values({
-                    year: game.year,
-                    active: true,
-                });
-                return c.json({
-                    success: true,
-                    message: "Success! Redirecting...",
-                });
-            } catch (err) {
-                console.log(err);
-                c.status(500);
-                return c.json({
-                    success: false,
-                    message: "Internal Server Error: could not create game",
+            const data = c.req.valid("json");
+            const { error: gameInsertError, result: gameInsertResult } =
+                await mightFail(
+                    db
+                        .insert(gamesTable)
+                        .values({
+                            year: data.year,
+                            active: true,
+                        })
+                        .returning()
+                );
+            if (gameInsertError) {
+                console.log("Error while creating game");
+                throw new HTTPException(500, {
+                    message: "Error while creating game",
+                    cause: gameInsertError,
                 });
             }
+            return c.json({ game: gameInsertResult[0] }, 200);
         }
     )
     .patch("/:game_id", zValidator("json", createGameSchema), async (c) => {
         console.log("function running");
         try {
             const game_id = Number.parseInt(c.req.param("game_id"));
-            const data = await c.req.valid("json");
+            const data = c.req.valid("json");
             const game = updateGameSchema.parse(data);
             await db
                 .update(gamesTable)
@@ -103,15 +108,13 @@ export const gamesRoute = new Hono()
         }
     })
     .get("/", async (c) => {
-        try {
-            const incomingGames = await db.select().from(gamesTable);
-            return c.json(incomingGames);
-        } catch (err) {
-            console.log(err);
-            c.status(500);
-            return c.json({
-                success: false,
-                message: "Internal Server Error: could not get games",
+        const { result: gamesQueryResult, error: gamesQueryError } =
+            await mightFail(db.select().from(gamesTable));
+        if (gamesQueryError) {
+            throw new HTTPException(500, {
+                message: "Error occurred when fetching games.",
+                cause: gamesQueryError,
             });
         }
+        return c.json({ games: gamesQueryResult });
     });

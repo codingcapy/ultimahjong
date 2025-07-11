@@ -4,9 +4,11 @@ import SideNav from "../components/SideNav";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import DOMAIN from "../services/endpoint";
-import useGamesStore from "../store/DashboardStore";
 import Game from "../components/dashboard/Game";
 import TopNav from "../components/TopNav";
+import { getGamesQueryOptions } from "../lib/api/games";
+import { useQuery } from "@tanstack/react-query";
+import GameComponent from "../components/dashboard/Game";
 
 export type Game = {
     game_id: number;
@@ -21,24 +23,8 @@ export const Route = createLazyFileRoute("/dashboard")({
 
 function RouteComponent() {
     const { user } = useAuthStore((state) => state);
-    const { games, setGames, currentGameId, setCurrentGameId } = useGamesStore(
-        (state) => state
-    );
     const navigate = useNavigate();
-
-    useEffect(() => {
-        if (!user) navigate({ to: "/" });
-        async function getGames() {
-            const res = await axios.get(`${DOMAIN}/api/games`);
-            const newGames: Game[] = [];
-            console.log(res.data);
-            //@ts-ignore
-            res.data.forEach((game) => newGames.push(game));
-            //@ts-ignore
-            setGames([...newGames]);
-        }
-        getGames();
-    }, []);
+    const { data: games } = useQuery(getGamesQueryOptions());
 
     return (
         <main className="flex-1 text-white">
@@ -49,10 +35,12 @@ function RouteComponent() {
                     <div className="md:grid grid-cols-5 gap-3">
                         {games &&
                             games.map(
-                                //@ts-ignore
                                 (game) =>
                                     game.active && (
-                                        <Game game={game} key={game.game_id} />
+                                        <GameComponent
+                                            game={game}
+                                            key={game.gameId}
+                                        />
                                     )
                             )}
                     </div>

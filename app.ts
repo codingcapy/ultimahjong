@@ -6,7 +6,9 @@ import { usersRoute } from "./routes/users";
 import { userRoute } from "./routes/user";
 import { gamesRoute } from "./routes/games";
 import { recordsRoute } from "./routes/records";
+import { serve } from "@hono/node-server";
 
+const PORT = parseInt(process.env.PORT!) || 3333;
 const app = new Hono();
 
 app.use("*", logger());
@@ -51,3 +53,8 @@ app.get("/*", async (c) => {
 
 export type ApiRoutes = typeof apiRoutes;
 export default app;
+
+const server = serve({
+    port: PORT,
+    fetch: app.fetch,
+});
