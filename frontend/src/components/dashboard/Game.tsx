@@ -2,9 +2,8 @@ import { Link } from "@tanstack/react-router";
 import useGamesStore from "../../store/DashboardStore";
 import { useState } from "react";
 import { LuEllipsisVertical } from "react-icons/lu";
-import axios from "axios";
-import DOMAIN from "../../services/endpoint";
 import { Game } from "../../../../schema/games";
+import { useDeleteGameMutation } from "../../lib/api/games";
 
 export default function GameComponent(props: { game: Game }) {
     const { game } = props;
@@ -18,6 +17,7 @@ export default function GameComponent(props: { game: Game }) {
     const { games, setGames, currentGameId, setCurrentGameId } = useGamesStore(
         (state) => state
     );
+    const { mutate: deleteGame } = useDeleteGameMutation();
 
     function toggleMenu() {
         setShowMenu(!showMenu);
@@ -44,18 +44,7 @@ export default function GameComponent(props: { game: Game }) {
 
     async function handleDeleteProject(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        // try {
-        //     await axios.post(`${DOMAIN}/api/games/${props.game.gameId}`);
-        //     const res = await axios.get(`${DOMAIN}/api/games`);
-        //     const newGames: Game[] = [];
-        //     console.log(res.data);
-        //     res.data.forEach((game) => newGames.push(game));
-        //     setGames([...newGames]);
-        //     setEditMode(false);
-        //     setShowMenu(false);
-        // } catch (error) {
-        //     console.error("Error deleting project:", error);
-        // }
+        deleteGame({ gameId: game.gameId || 0 });
     }
 
     return (

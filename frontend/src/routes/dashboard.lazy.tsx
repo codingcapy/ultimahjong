@@ -26,6 +26,10 @@ function RouteComponent() {
     const navigate = useNavigate();
     const { data: games } = useQuery(getGamesQueryOptions());
 
+    useEffect(() => {
+        if (!user) navigate({ to: "/" });
+    }, [user]);
+
     return (
         <main className="flex-1 text-white">
             <TopNav />

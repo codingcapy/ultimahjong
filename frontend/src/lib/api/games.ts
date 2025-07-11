@@ -8,6 +8,10 @@ import { ArgumentTypes, client, ExtractData } from "./client";
 
 type CreateGameArgs = ArgumentTypes<typeof client.api.games.$post>[0]["json"];
 
+type DeleteGameArgs = ArgumentTypes<
+    typeof client.api.games.delete.$post
+>[0]["json"];
+
 type SerializeGame = ExtractData<
     Awaited<ReturnType<typeof client.api.games.$get>>
 >["games"][number];
@@ -76,3 +80,30 @@ export const getGamesQueryOptions = () =>
         queryKey: ["games"],
         queryFn: () => getGames(),
     });
+
+async function deleteGame(args: DeleteGameArgs) {
+    const res = await client.api.games.delete.$post({
+        json: args,
+    });
+    if (!res.ok) {
+        throw new Error("Error updating user.");
+    }
+    const { game } = await res.json();
+    return mapSerializedGameToSchema(game);
+}
+
+export const useDeleteGameMutation = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: deleteGame,
+        onSettled: (game) => {
+            if (!game) return;
+            queryClient.invalidateQueries({
+                queryKey: ["games"],
+            });
+            queryClient.invalidateQueries({
+                queryKey: ["games"],
+            });
+        },
+    });
+};
