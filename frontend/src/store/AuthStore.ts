@@ -24,7 +24,7 @@ const useAuthStore = create<{
         set({ authLoading: true });
         try {
             const res = await axios.post(
-                "https://ultimahjong-production-3fbe.up.railway.app/",
+                "https://ultimahjong-production-3fbe.up.railway.app/api/user/login",
                 {
                     email,
                     password,
@@ -44,7 +44,7 @@ const useAuthStore = create<{
     loginWithToken: async () => {
         try {
             const res = await axios.post(
-                "https://ultimahjong-production-3fbe.up.railway.app/"
+                "https://ultimahjong-production-3fbe.up.railway.app/api/user/validation"
             );
             if (res.data.result?.user && res.data.result?.token) {
                 setSession(res.data.result?.token);
