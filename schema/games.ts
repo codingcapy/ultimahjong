@@ -8,7 +8,7 @@ import {
 import type { InferSelectModel } from "drizzle-orm";
 
 export const games = pgTable("games", {
-    gameId: serial("game_id").primaryKey(),
+    gameId: serial("game_id").primaryKey().notNull(),
     year: varchar("year"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     active: boolean("active").default(true),

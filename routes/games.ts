@@ -59,31 +59,37 @@ export const gamesRoute = new Hono()
             return c.json({ game: gameInsertResult[0] }, 200);
         }
     )
-    .patch("/:game_id", zValidator("json", createGameSchema), async (c) => {
-        console.log("function running");
-        try {
-            const game_id = Number.parseInt(c.req.param("game_id"));
+    .post(
+        "/update",
+        zValidator(
+            "json",
+            createInsertSchema(gamesTable).omit({
+                active: true,
+                createdAt: true,
+            })
+        ),
+        async (c) => {
             const data = c.req.valid("json");
-            const game = updateGameSchema.parse(data);
-            await db
-                .update(gamesTable)
-                .set({
-                    year: game.year,
-                })
-                .where(eq(gamesTable.gameId, game_id));
-            return c.json({
-                success: true,
-                message: "Success! Redirecting...",
-            });
-        } catch (err) {
-            console.log(err);
-            c.status(500);
-            return c.json({
-                success: false,
-                message: "Internal Server Error: could not create game",
-            });
+            const { error: gameUpdateError, result: gameDUpdateResult } =
+                await mightFail(
+                    await db
+                        .update(gamesTable)
+                        .set({
+                            year: data.year,
+                        })
+                        .where(eq(gamesTable.gameId, Number(data.gameId)))
+                        .returning()
+                );
+            if (gameUpdateError) {
+                console.log("Error while creating user");
+                throw new HTTPException(500, {
+                    message: "Error while updating user",
+                    cause: gameUpdateError,
+                });
+            }
+            return c.json({ game: gameDUpdateResult[0] }, 200);
         }
-    })
+    )
     .post(
         "/delete",
         zValidator(
