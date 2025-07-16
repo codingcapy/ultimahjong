@@ -12,6 +12,10 @@ type DeleteGameArgs = ArgumentTypes<
     typeof client.api.games.delete.$post
 >[0]["json"];
 
+type UpdateGameArgs = ArgumentTypes<
+    typeof client.api.games.update.$post
+>[0]["json"];
+
 type SerializeGame = ExtractData<
     Awaited<ReturnType<typeof client.api.games.$get>>
 >["games"][number];
@@ -27,7 +31,7 @@ async function createGame(args: CreateGameArgs) {
     const res = await client.api.games.$post({ json: args });
     if (!res.ok) {
         let errorMessage =
-            "There was an issue creating your account :( We'll look into it ASAP!";
+            "There was an issue creating your game :( We'll look into it ASAP!";
         try {
             const errorResponse = await res.json();
             if (
@@ -69,7 +73,7 @@ async function getGames() {
     const res = await client.api.games.$get();
 
     if (!res.ok) {
-        throw new Error("Error getting chats by chatId");
+        throw new Error("Error getting games");
     }
     const { games } = await res.json();
     return games.map((game) => mapSerializedGameToSchema(game));
@@ -86,7 +90,7 @@ async function deleteGame(args: DeleteGameArgs) {
         json: args,
     });
     if (!res.ok) {
-        throw new Error("Error updating user.");
+        throw new Error("Error deleting game.");
     }
     const { game } = await res.json();
     return mapSerializedGameToSchema(game);
@@ -96,6 +100,33 @@ export const useDeleteGameMutation = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: deleteGame,
+        onSettled: (game) => {
+            if (!game) return;
+            queryClient.invalidateQueries({
+                queryKey: ["games"],
+            });
+            queryClient.invalidateQueries({
+                queryKey: ["games"],
+            });
+        },
+    });
+};
+
+async function updateGame(args: UpdateGameArgs) {
+    const res = await client.api.games.update.$post({
+        json: args,
+    });
+    if (!res.ok) {
+        throw new Error("Error updating game.");
+    }
+    const { game } = await res.json();
+    return mapSerializedGameToSchema(game);
+}
+
+export const useUpdateGameMutation = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: updateGame,
         onSettled: (game) => {
             if (!game) return;
             queryClient.invalidateQueries({
