@@ -3,7 +3,10 @@ import useGamesStore from "../../store/DashboardStore";
 import { useState } from "react";
 import { LuEllipsisVertical } from "react-icons/lu";
 import { Game } from "../../../../schema/games";
-import { useDeleteGameMutation } from "../../lib/api/games";
+import {
+    useDeleteGameMutation,
+    useUpdateGameMutation,
+} from "../../lib/api/games";
 
 export default function GameComponent(props: { game: Game }) {
     const { game } = props;
@@ -18,6 +21,7 @@ export default function GameComponent(props: { game: Game }) {
         (state) => state
     );
     const { mutate: deleteGame } = useDeleteGameMutation();
+    const { mutate: updateGame } = useUpdateGameMutation();
 
     function toggleMenu() {
         setShowMenu(!showMenu);
@@ -26,20 +30,7 @@ export default function GameComponent(props: { game: Game }) {
     async function handleUpdateTitle(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         const newTitle = (e.target as HTMLFormElement).projecttitle.value;
-        // try {
-        //     await axios.patch(`${DOMAIN}/api/games/${props.game.gameId}`, {
-        //         year: newTitle,
-        //     });
-        //     const res = await axios.get(`${DOMAIN}/api/games`);
-        //     const newGames: Game[] = [];
-        //     console.log(res.data);
-        //     res.data.forEach((game) => newGames.push(game));
-        //     setGames([...newGames]);
-        //     setEditMode(false);
-        //     setShowMenu(false);
-        // } catch (error) {
-        //     console.error("Error updating project title:", error);
-        // }
+        updateGame({ gameId: game.gameId, year: newTitle });
     }
 
     async function handleDeleteProject(e: React.FormEvent<HTMLFormElement>) {
