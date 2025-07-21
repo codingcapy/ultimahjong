@@ -8,25 +8,6 @@ import { createInsertSchema } from "drizzle-zod";
 import { mightFail } from "might-fail";
 import { HTTPException } from "hono/http-exception";
 
-const gameSchema = z.object({
-    game_id: z.number(),
-    year: z.string(),
-    created_at: z.string(),
-    active: z.boolean().default(true),
-});
-
-const createGameSchema = gameSchema.omit({
-    game_id: true,
-    created_at: true,
-    active: true,
-});
-
-const updateGameSchema = gameSchema.omit({
-    game_id: true,
-    created_at: true,
-    active: true,
-});
-
 export const gamesRoute = new Hono()
     .post(
         "/",
