@@ -51,4 +51,15 @@ export const recordsRoute = new Hono()
                 message: "Internal Server Error: could not get records",
             });
         }
+    })
+    .get("/", async (c) => {
+        const { result: recordsQueryResult, error: recordsQueryError } =
+            await mightFail(db.select().from(recordsTable));
+        if (recordsQueryError) {
+            throw new HTTPException(500, {
+                message: "Error occurred when fetching games.",
+                cause: recordsQueryError,
+            });
+        }
+        return c.json({ records: recordsQueryResult });
     });

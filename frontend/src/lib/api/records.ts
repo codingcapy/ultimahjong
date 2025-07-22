@@ -12,7 +12,7 @@ type CreateRecordArgs = ArgumentTypes<
 
 type SerializeRecord = ExtractData<
     Awaited<ReturnType<typeof client.api.records.$get>>
->["games"][number];
+>["records"][number];
 
 export function mapSerializedRecordToSchema(
     SerializedRecord: SerializeRecord
@@ -71,7 +71,7 @@ async function getRecords() {
     const res = await client.api.records.$get();
 
     if (!res.ok) {
-        throw new Error("Error getting games");
+        throw new Error("Error getting records");
     }
     const { records } = await res.json();
     return records.map((record) => mapSerializedRecordToSchema(record));
