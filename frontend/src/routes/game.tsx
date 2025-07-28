@@ -1,4 +1,4 @@
-import { createLazyFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import useAuthStore from "../store/AuthStore";
 import { IoMdExit } from "react-icons/io";
 import axios from "axios";
@@ -8,8 +8,10 @@ import { useEffect, useState } from "react";
 import { LuEllipsisVertical } from "react-icons/lu";
 import TopNav from "../components/TopNav";
 import Record from "../components/record/Record";
+import { getRecordsQueryOptions } from "../lib/api/records";
+import { useQuery } from "@tanstack/react-query";
 
-export const Route = createLazyFileRoute("/record")({
+export const Route = createFileRoute("/game")({
     component: RouteComponent,
 });
 
@@ -18,28 +20,12 @@ function RouteComponent() {
     const { logoutService, authLoading, user } = useAuthStore((state) => state);
     const [notification, setNotification] = useState("");
     const { currentGameId } = useGamesStore((state) => state);
-    const [records, setRecords] = useState([]);
+    const { data: records } = useQuery(getRecordsQueryOptions());
 
     function handleLogout() {
         logoutService();
         navigate({ to: "/" });
     }
-
-    useEffect(() => {
-        console.log(user);
-        if (!user) navigate({ to: "/" });
-        async function getRecords() {
-            const currentId = Number(currentGameId);
-            const res = await axios.get(`${DOMAIN}/api/records/${currentId}`);
-            //@ts-ignore
-            const newRecords = [];
-            //@ts-ignore
-            res.data.forEach((record) => newRecords.push(record));
-            //@ts-ignore
-            setRecords([...newRecords]);
-        }
-        getRecords();
-    }, []);
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -191,9 +177,8 @@ function RouteComponent() {
                         <div>loser</div>
                         <div>points won</div>
                     </div>
-                    {records.map((record) => (
-                        <Record record={record} />
-                    ))}
+                    {records &&
+                        records.map((record) => <Record record={record} />)}
                 </div>
             </div>
         </main>

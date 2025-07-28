@@ -14,21 +14,15 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as RegisterImport } from './routes/register'
+import { Route as GameImport } from './routes/game'
 
 // Create Virtual Routes
 
-const RecordLazyImport = createFileRoute('/record')()
 const DashboardLazyImport = createFileRoute('/dashboard')()
 const AboutLazyImport = createFileRoute('/about')()
 const IndexLazyImport = createFileRoute('/')()
 
 // Create/Update Routes
-
-const RecordLazyRoute = RecordLazyImport.update({
-  id: '/record',
-  path: '/record',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/record.lazy').then((d) => d.Route))
 
 const DashboardLazyRoute = DashboardLazyImport.update({
   id: '/dashboard',
@@ -48,6 +42,12 @@ const RegisterRoute = RegisterImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const GameRoute = GameImport.update({
+  id: '/game',
+  path: '/game',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const IndexLazyRoute = IndexLazyImport.update({
   id: '/',
   path: '/',
@@ -63,6 +63,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/game': {
+      id: '/game'
+      path: '/game'
+      fullPath: '/game'
+      preLoaderRoute: typeof GameImport
       parentRoute: typeof rootRoute
     }
     '/register': {
@@ -86,13 +93,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardLazyImport
       parentRoute: typeof rootRoute
     }
-    '/record': {
-      id: '/record'
-      path: '/record'
-      fullPath: '/record'
-      preLoaderRoute: typeof RecordLazyImport
-      parentRoute: typeof rootRoute
-    }
   }
 }
 
@@ -100,52 +100,52 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
+  '/game': typeof GameRoute
   '/register': typeof RegisterRoute
   '/about': typeof AboutLazyRoute
   '/dashboard': typeof DashboardLazyRoute
-  '/record': typeof RecordLazyRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
+  '/game': typeof GameRoute
   '/register': typeof RegisterRoute
   '/about': typeof AboutLazyRoute
   '/dashboard': typeof DashboardLazyRoute
-  '/record': typeof RecordLazyRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
+  '/game': typeof GameRoute
   '/register': typeof RegisterRoute
   '/about': typeof AboutLazyRoute
   '/dashboard': typeof DashboardLazyRoute
-  '/record': typeof RecordLazyRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/register' | '/about' | '/dashboard' | '/record'
+  fullPaths: '/' | '/game' | '/register' | '/about' | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/register' | '/about' | '/dashboard' | '/record'
-  id: '__root__' | '/' | '/register' | '/about' | '/dashboard' | '/record'
+  to: '/' | '/game' | '/register' | '/about' | '/dashboard'
+  id: '__root__' | '/' | '/game' | '/register' | '/about' | '/dashboard'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
+  GameRoute: typeof GameRoute
   RegisterRoute: typeof RegisterRoute
   AboutLazyRoute: typeof AboutLazyRoute
   DashboardLazyRoute: typeof DashboardLazyRoute
-  RecordLazyRoute: typeof RecordLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
+  GameRoute: GameRoute,
   RegisterRoute: RegisterRoute,
   AboutLazyRoute: AboutLazyRoute,
   DashboardLazyRoute: DashboardLazyRoute,
-  RecordLazyRoute: RecordLazyRoute,
 }
 
 export const routeTree = rootRoute
@@ -159,14 +159,17 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/game",
         "/register",
         "/about",
-        "/dashboard",
-        "/record"
+        "/dashboard"
       ]
     },
     "/": {
       "filePath": "index.lazy.tsx"
+    },
+    "/game": {
+      "filePath": "game.tsx"
     },
     "/register": {
       "filePath": "register.tsx"
@@ -176,9 +179,6 @@ export const routeTree = rootRoute
     },
     "/dashboard": {
       "filePath": "dashboard.lazy.tsx"
-    },
-    "/record": {
-      "filePath": "record.lazy.tsx"
     }
   }
 }

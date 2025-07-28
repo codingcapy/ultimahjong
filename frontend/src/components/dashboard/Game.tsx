@@ -94,7 +94,7 @@ export default function GameComponent(props: { game: Game }) {
                     onClick={() => setDeleteMode(false)}
                 ></div>
             )}
-            <Link to="/record">
+            <Link to="/game">
                 <div
                     className="py-10 bg-gray-600 text-center text-white my-2 md:my-0"
                     key={props.game.gameId}

@@ -2,20 +2,9 @@ import axios from "axios";
 import { useState } from "react";
 import { LuEllipsisVertical } from "react-icons/lu";
 import DOMAIN from "../../services/endpoint";
+import { Record } from "../../../../schema/records";
 
-type RecordType = {
-    record_id: number;
-    created_at: string;
-    winner: string;
-    loser: string;
-    points: number;
-};
-
-type RecordProps = {
-    record: RecordType;
-};
-
-export default function Record(props: RecordProps) {
+export default function RecordComponent(props: { record: Record }) {
     const [showMenu, setShowMenu] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [deleteMode, setDeleteMode] = useState(false);
@@ -26,20 +15,6 @@ export default function Record(props: RecordProps) {
 
     async function handleDeleteRecord(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        try {
-            await axios.post(`${DOMAIN}/api/records/${props.record.record_id}`);
-            const res = await axios.get(`${DOMAIN}/api/records/`);
-            const newRecords: RecordType[] = [];
-            console.log(res.data);
-            //@ts-ignore
-            res.data.forEach((record) => newRecords.push(record));
-            //@ts-ignore
-            //setRecords([...newRecords]);
-            setEditMode(false);
-            setShowMenu(false);
-        } catch (error) {
-            console.error("Error deleting project:", error);
-        }
     }
 
     return (
@@ -52,7 +27,7 @@ export default function Record(props: RecordProps) {
                     <div className="">
                         You are about to permanently delete{" "}
                         <span className="text-[#D2B1FD]">
-                            {props.record.record_id}
+                            {props.record.recordId}
                         </span>
                         . This <br /> record will be gone forever.
                     </div>
@@ -87,9 +62,9 @@ export default function Record(props: RecordProps) {
             )}
             <div
                 className="grid grid-cols-5 relative"
-                key={props.record.record_id}
+                key={props.record.recordId}
             >
-                <div>{props.record.created_at.slice(0, 10)}</div>
+                <div>{props.record.createdAt.toString().slice(0, 10)}</div>
                 <div>{props.record.winner}</div>
                 <div>{props.record.loser}</div>
                 <div>{props.record.points}</div>
