@@ -62,4 +62,39 @@ export const recordsRoute = new Hono()
             });
         }
         return c.json({ records: recordsQueryResult });
-    });
+    })
+    .post(
+        "/delete",
+        zValidator(
+            "json",
+            createInsertSchema(recordsTable).omit({
+                gameId: true,
+                winner: true,
+                loser: true,
+                points: true,
+                active: true,
+                createdAt: true,
+            })
+        ),
+        async (c) => {
+            const data = c.req.valid("json");
+            const { error: recordDeleteError, result: recordDeleteResult } =
+                await mightFail(
+                    await db
+                        .update(recordsTable)
+                        .set({
+                            active: false,
+                        })
+                        .where(eq(recordsTable.recordId, Number(data.recordId)))
+                        .returning()
+                );
+            if (recordDeleteError) {
+                console.log("Error while creating user");
+                throw new HTTPException(500, {
+                    message: "Error while creating user",
+                    cause: recordDeleteError,
+                });
+            }
+            return c.json({ game: recordDeleteResult[0] }, 200);
+        }
+    );
