@@ -95,6 +95,6 @@ export const recordsRoute = new Hono()
                     cause: recordDeleteError,
                 });
             }
-            return c.json({ game: recordDeleteResult[0] }, 200);
+            return c.json({ record: recordDeleteResult[0] }, 200);
         }
     );
