@@ -1,13 +1,14 @@
-import axios from "axios";
 import { useState } from "react";
 import { LuEllipsisVertical } from "react-icons/lu";
-import DOMAIN from "../../services/endpoint";
 import { Record } from "../../../../schema/records";
+import { useDeleteRecordMutation } from "../../lib/api/records";
 
 export default function RecordComponent(props: { record: Record }) {
     const [showMenu, setShowMenu] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [deleteMode, setDeleteMode] = useState(false);
+    const { mutate: deleteRecord } = useDeleteRecordMutation();
+    const { record } = props;
 
     function toggleMenu() {
         setShowMenu(!showMenu);
@@ -15,6 +16,7 @@ export default function RecordComponent(props: { record: Record }) {
 
     async function handleDeleteRecord(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
+        deleteRecord({ recordId: record.recordId });
     }
 
     return (
@@ -32,7 +34,7 @@ export default function RecordComponent(props: { record: Record }) {
                         . This <br /> record will be gone forever.
                     </div>
                     <div className="mx-auto py-2">
-                        <form>
+                        <form onSubmit={(e) => handleDeleteRecord(e)}>
                             <input
                                 name="content"
                                 id="content"
