@@ -8,7 +8,10 @@ import { useEffect, useState } from "react";
 import { LuEllipsisVertical } from "react-icons/lu";
 import TopNav from "../components/TopNav";
 import Record from "../components/record/Record";
-import { getRecordsQueryOptions } from "../lib/api/records";
+import {
+    getRecordsQueryOptions,
+    useCreateRecordMutation,
+} from "../lib/api/records";
 import { useQuery } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/game")({
@@ -21,6 +24,7 @@ function RouteComponent() {
     const [notification, setNotification] = useState("");
     const { currentGameId } = useGamesStore((state) => state);
     const { data: records } = useQuery(getRecordsQueryOptions());
+    const { mutate: createRecord } = useCreateRecordMutation();
 
     function handleLogout() {
         logoutService();
@@ -29,33 +33,21 @@ function RouteComponent() {
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        try {
-            const winner = (e.target as HTMLFormElement).winner.value;
-            console.log(winner);
-            const loser = (e.target as HTMLFormElement).loser.value;
-            console.log(loser);
-            const points = Number((e.target as HTMLFormElement).points.value);
-            console.log(points);
-            const game_id = currentGameId;
-            console.log(currentGameId);
-            const newRecord = {
-                game_id: game_id,
-                winner: winner,
-                loser: loser,
-                points: points,
-            };
-            const res = await axios.post(`${DOMAIN}/api/records`, newRecord);
-            if (res.data.success) {
-                setNotification("Success!");
-                //@ts-ignore
-                setRecords([...records, res.data.record]);
-            } else {
-                setNotification("Failure");
-            }
-        } catch (err) {
-            setNotification("There was an issue adding record :(");
-            console.log(err);
-        }
+        const winner = (e.target as HTMLFormElement).winner.value;
+        console.log(winner);
+        const loser = (e.target as HTMLFormElement).loser.value;
+        console.log(loser);
+        const points = Number((e.target as HTMLFormElement).points.value);
+        console.log(points);
+        const game_id = currentGameId;
+        console.log(currentGameId);
+        const newRecord = {
+            game_id: game_id,
+            winner: winner,
+            loser: loser,
+            points: points,
+        };
+        createRecord(newRecord);
     }
 
     console.log(currentGameId);
@@ -178,7 +170,9 @@ function RouteComponent() {
                         <div>points won</div>
                     </div>
                     {records &&
-                        records.map((record) => <Record record={record} />)}
+                        records.map((record) => (
+                            <Record key={record.recordId} record={record} />
+                        ))}
                 </div>
             </div>
         </main>
