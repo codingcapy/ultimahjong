@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LuEllipsisVertical } from "react-icons/lu";
 import { Record } from "../../../../schema/records";
 import { useDeleteRecordMutation } from "../../lib/api/records";
@@ -9,6 +9,7 @@ export default function RecordComponent(props: { record: Record }) {
     const [deleteMode, setDeleteMode] = useState(false);
     const { mutate: deleteRecord } = useDeleteRecordMutation();
     const { record } = props;
+    const menuRef = useRef<HTMLDivElement | null>(null);
 
     function toggleMenu() {
         setShowMenu(!showMenu);
@@ -17,7 +18,26 @@ export default function RecordComponent(props: { record: Record }) {
     async function handleDeleteRecord(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         deleteRecord({ recordId: record.recordId });
+        setDeleteMode(false);
     }
+
+    function handleClickOutsideContextMenu(event: MouseEvent) {
+        if (
+            menuRef.current &&
+            !menuRef.current.contains(event.target as Node)
+        ) {
+            setShowMenu(false);
+        }
+    }
+
+    useEffect(() => {
+        document.addEventListener("click", handleClickOutsideContextMenu);
+        return () =>
+            document.removeEventListener(
+                "click",
+                handleClickOutsideContextMenu
+            );
+    }, []);
 
     return (
         <div>
@@ -70,7 +90,7 @@ export default function RecordComponent(props: { record: Record }) {
                 <div>{props.record.winner}</div>
                 <div>{props.record.loser}</div>
                 <div>{props.record.points}</div>
-                <div className="py-2">
+                <div className="py-2" ref={menuRef}>
                     <LuEllipsisVertical
                         onClick={toggleMenu}
                         className="cursor-pointer"

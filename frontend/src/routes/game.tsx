@@ -170,9 +170,11 @@ function RouteComponent() {
                         <div>points won</div>
                     </div>
                     {records &&
-                        records.map((record) => (
-                            <Record key={record.recordId} record={record} />
-                        ))}
+                        records
+                            .filter((record) => record.active)
+                            .map((record) => (
+                                <Record key={record.recordId} record={record} />
+                            ))}
                 </div>
             </div>
         </main>
