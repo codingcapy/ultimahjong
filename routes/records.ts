@@ -97,4 +97,36 @@ export const recordsRoute = new Hono()
             }
             return c.json({ record: recordDeleteResult[0] }, 200);
         }
+    )
+    .post(
+        "/update",
+        zValidator(
+            "json",
+            createInsertSchema(recordsTable).omit({
+                active: true,
+                createdAt: true,
+            })
+        ),
+        async (c) => {
+            const data = c.req.valid("json");
+            const { error: recordUpdateError, result: recordDUpdateResult } =
+                await mightFail(
+                    await db
+                        .update(recordsTable)
+                        .set({
+                            winner: data.winner,
+                            loser: data.loser,
+                            points: data.points,
+                        })
+                        .where(eq(recordsTable.recordId, Number(data.recordId)))
+                        .returning()
+                );
+            if (recordUpdateError) {
+                throw new HTTPException(500, {
+                    message: "Error while updating record",
+                    cause: recordUpdateError,
+                });
+            }
+            return c.json({ record: recordDUpdateResult[0] }, 200);
+        }
     );
