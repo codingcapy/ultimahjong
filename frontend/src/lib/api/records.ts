@@ -14,6 +14,10 @@ type DeleteRecordArgs = ArgumentTypes<
     typeof client.api.records.delete.$post
 >[0]["json"];
 
+type UpdateRecordArgs = ArgumentTypes<
+    typeof client.api.records.update.$post
+>[0]["json"];
+
 type SerializeRecord = ExtractData<
     Awaited<ReturnType<typeof client.api.records.$get>>
 >["records"][number];
@@ -102,6 +106,33 @@ export const useDeleteRecordMutation = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: deleteRecord,
+        onSettled: (record) => {
+            if (!record) return;
+            queryClient.invalidateQueries({
+                queryKey: ["records"],
+            });
+            queryClient.invalidateQueries({
+                queryKey: ["records"],
+            });
+        },
+    });
+};
+
+async function updateRecord(args: UpdateRecordArgs) {
+    const res = await client.api.records.update.$post({
+        json: args,
+    });
+    if (!res.ok) {
+        throw new Error("Error update game.");
+    }
+    const { record } = await res.json();
+    return mapSerializedRecordToSchema(record);
+}
+
+export const useupdateRecordMutation = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: updateRecord,
         onSettled: (record) => {
             if (!record) return;
             queryClient.invalidateQueries({
